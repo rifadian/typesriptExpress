@@ -2,48 +2,70 @@ import {Request, Response} from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
 import IController from './ControllerInterface';
-
-let data: any[] = [
-    {id: 1, name: "rifa"},
-    {id: 2, name: "dian"},
-    {id: 3, name: "eka"},
-    {id: 4, name: "farah"}
-];
+import UserService from "../../services/UserService";
+import { async } from "@firebase/util";
+import Authentication from "../../utils/Authentication";
+import db from "../../db/models";
 
 
 class UserController implements IController{
-    index(req: Request , res: Response): Response {
-        console.log("ini adalah index users");
-        return res.send(data);
+    index = async (req: Request , res: Response): Promise <Response> => {
+        const service: UserService = new UserService (req);
+        const users = await service.getAll();
+
+
+        return res.send({
+            data: users,
+            message: ""
+        });
     }
-    create(req: Request, res: Response): Response {
-        const {id, name} = req.body;
 
-        data.push({ id,name});
+    create = async (req: Request, res: Response): Promise <Response> => {
+        const service: UserService = new UserService(req);
+        const users = await service.store();
 
-        return res.send("create sukses");
+        return res.send({
+            data: users,
+            message: ""
+        });
     }
-    show(req: Request, res: Response): Response {
-        const {id} = req.params;
 
-        let person = data.find(item => item.id == id);
-        return res.send(person);
+    // create = async(req: Request, res: Response) : Promise<Response> => {
+    //     let {username, password} = req.body;
+    //     const hashedPassword: string = await Authentication.passwordHash(password);
+
+    //    await db.user.create({username, password: hashedPassword});
+    //     return res.send("register sukses");
+    // }
+
+    show = async (req: Request, res: Response): Promise <Response> => {
+        const service: UserService = new UserService(req);
+        const users = await service.getOne();
+
+        return res.send({
+            data: users,
+            message: ""
+        });
 
     }
-    update(req: Request, res: Response): Response {
-        const {id} = req.params;
-        const { name } = req.body;
 
-        let person = data.find(item => item.id == id);
-        person.name = name;
+    update = async (req: Request, res: Response):Promise <Response> => {
+        const service: UserService = new UserService(req);
+        const todos = await service.update();
 
-        return res.send ("update sukses");
+        return res.send({
+            data: todos,
+            message: "user updated"
+        })
     }
-    delete(req: Request, res: Response): Response {
-        const { id } = req.params;
+    delete = async (req: Request, res: Response):Promise <Response> => {
+        const service: UserService = new UserService(req);
+        const todos = await service.delete();
 
-        let people = data.filter (item => item.id != id );
-        return res.send(people);
+        return res.send({
+            data: todos,
+            message: "user deleted"
+        });
     }
     
 

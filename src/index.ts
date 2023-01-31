@@ -7,10 +7,13 @@ import cors from "cors";
 import {config as dotenv} from "dotenv";
 
 //router
-import UserRoutes from "./routers/UserRouter";
+import UserRoutes from "./routers/UserRouter"; 
 import AuthRoutes from "./routers/AuthRoutes";
-
 import TodoRoutes from "./routers/TodoRoutes";
+
+//swagger 
+const swaggerUi = require('swagger-ui-express');
+const apiDocumentation = require ('../apidocs.json');
 
 class App {
     public app: Application;
@@ -28,6 +31,7 @@ class App {
         this.app.use(compression());
         this.app.use(helmet());
         this.app.use(cors());
+
     }
 
     protected routes(): void {
@@ -47,3 +51,4 @@ app.listen(port, () => {
     console.log("Aplikasi ini berjalan di port" + port)
     console.log(process.env.DB_USER);
 });
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(apiDocumentation));
